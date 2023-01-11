@@ -13,7 +13,7 @@ public class IndexModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private LocalProbe? probe;
 
-    static HttpClient client = new HttpClient();
+    static HttpClient client = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
 
     public IndexModel(ILogger<IndexModel> logger)
     {
@@ -21,7 +21,7 @@ public class IndexModel : PageModel
         probe = JsonConvert.DeserializeObject<LocalProbe>(JObject.Parse(System.IO.File.ReadAllText("appsettings.json"))["LocalProbe"].ToString());
     }
 
-    public void OnGet()
+    public ActionResult OnGet()
     {
         List<bool> responses = new List<bool>();
         string url;
@@ -49,5 +49,6 @@ public class IndexModel : PageModel
         {
             throw new Exception("All paths not healthy");
         }
+        return new JsonResult("All paths healthy");
     }
 }
