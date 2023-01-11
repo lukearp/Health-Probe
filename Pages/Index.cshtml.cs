@@ -13,7 +13,7 @@ public class IndexModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private LocalProbe? probe;
 
-    static HttpClient client = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
+    static HttpClient client = new HttpClient() { Timeout = TimeSpan.FromSeconds((int)JObject.Parse(System.IO.File.ReadAllText("appsettings.json"))["TimeOut"]) };
 
     public IndexModel(ILogger<IndexModel> logger)
     {
@@ -47,7 +47,14 @@ public class IndexModel : PageModel
         }
         if (responses.Contains(false))
         {
-            throw new Exception("All paths not healthy");
+            string result = "";
+            int count = 0;
+            foreach(bool test in responses)
+            {
+                result += "Path " + count.ToString() + " Result:" + test + "\n";
+                count++;
+            }
+            throw new Exception(result);
         }
         return new JsonResult("All paths healthy");
     }
